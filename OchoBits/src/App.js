@@ -1,32 +1,41 @@
-//import logo from './logo.svg';
 import './App.css';
-
+import "./components/css/styles.css"
+import { useEffect, useState } from "react";
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Login from './components/Login';
 import Signin from './components/Signin';
-import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
-import { Nav } from 'react-bootstrap';
-import "./components/css/styles.css"
-
+import Home from './components/Home';
+import Tables from './components/Tables';
 
 function App() {
+  /* let navigate = useNavigate(); */
+  /* if (!sessionStorage.getItem('idUser')) {
+    navigate("/", { replace: true }); */
+    //alert("You must logued first")
+  /* } */
+  const [head, setHead ] = useState("");
+  const location = useLocation();
 
-  const renderHead = () => {
-    return(
-      <Header/>
-    )
-  }
-
+  useEffect(() => {
+    let location2 = window.location.pathname
+    if(location2 !== "/" && location2 !== "/signin"){
+      setHead(<Header/>)
+    }else{
+      setHead("")
+    }
+  }, [location]);
+  
   return (
       <div className='body'>
-        <Header/>
-        
-        <Router>
+        {head}
+        {/* <Router> is defined in index.js  */}
           <Routes>
-            <Route path="login" element={<Login />} />
-            <Route path="signin" element={<Signin />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/signin" element={<Signin />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/tables" element={<Tables />} />
           </Routes>
-        </Router>
       </div>
   );
 }

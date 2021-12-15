@@ -350,9 +350,9 @@ input.form-control:focus, button.btn-index:focus{
     background-color: #5a57e7;
 }
 /* aside */
-.aside-user, .aside-laptop{
+/* .aside-user, .aside-laptop{
     display: none;
-}
+} */
 .radio{
     cursor: pointer;
 }

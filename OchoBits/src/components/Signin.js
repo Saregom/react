@@ -56,14 +56,14 @@ const Signin = () =>{
         for(const msg in reqs){
             if(reqs[msg].length !== 0){
                 correct = false
-                alert("There are errors, check inputs")
+                //alert("There are errors, check inputs")
             }
         }
         if(correct){
-            console.log("no err")
             registerClient()
         }
     }
+
     let navigate = useNavigate();
     const registerClient = () =>{
         axios.post("http://144.22.242.102/api/user/new", user).then(function(res){
@@ -93,7 +93,7 @@ const Signin = () =>{
                             className="form-control" 
                             type="text" 
                             placeholder="." 
-                            required 
+                            required
                             style={{height: '50px'}}/>
                             <label >First name</label>
                         </div>
@@ -226,7 +226,8 @@ const Signin = () =>{
                             value={user.type}
                             onChange={handleChange}
                             className="selected" 
-                            required style={{height: '50px'}}>
+                            required
+                            style={{height: '50px'}}>
                                 <option value="" disabled defaultValue>Type</option>
                                 <option value="COORD">COORD</option>
                                 <option value="ASE">ASE</option>
@@ -234,7 +235,7 @@ const Signin = () =>{
                             </select>
                         </div>
                     </div>
-                    <input className="btn-index btn-blue" onClick={validations} type='submit' value="Sign up"/>
+                    <input className="btn-index btn-blue" type='submit' value="Sign up"/>
                 </form>
                 <hr/>
                 <NavLink className="haveAcount" exact="true" to="/">I already have an account</NavLink>

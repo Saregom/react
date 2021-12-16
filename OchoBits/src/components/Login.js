@@ -15,6 +15,7 @@ const Login = () =>{
         event.preventDefault()
         axios.get("http://144.22.242.102/api/user/"+user.email+"/"+user.password).then(function(res){
             const data = res.data
+            console.log(data)
             if(data.id == null){
                 alert("Email o contraseña incorrectos")
             }else{

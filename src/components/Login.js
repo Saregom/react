@@ -17,7 +17,7 @@ const Login = () =>{
     let navigate = useNavigate();
     const verifyUser = (event) => {
         event.preventDefault()
-        axios.get(`http://144.22.242.102/api/user/${user.email}/${user.password}`).then(function(res){
+        axios.get(`http://144.22.242.102/api/user/${user.email}/${user.password}/`).then(function(res){
             const data = res.data
             if(data.id == null){
                 alert("Incorrect email or password")

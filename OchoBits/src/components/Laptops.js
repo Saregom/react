@@ -4,6 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 const Laptops = () =>{
+
+    const [myAlert, setMyAlert] = useState("")
+
     const [laptop, setLaptop ] = useState({
         id: "",
         brand: "",
@@ -23,19 +26,41 @@ const Laptops = () =>{
 
     const [optionCrud, setOptionCrud ] = useState("POST")
 
-    const [myRef, setMyRef ] = useState({
-        inpId: React.createRef()
-    })
+    const myRef = React.createRef()
 
-    useEffect(() => {
+    const inputChange = (event) => {
+        const {name, value} = event.target
+        setLaptop({...laptop, [name]:value})
+    }
+
+    const crudChange = (event) => {
+        setOptionCrud(event.target.value)
+    }
+
+    const callLaptops = () => {
         axios.get("http://144.22.242.102/api/laptop/all").then(function(res){
+            if(res.data.length === 0){
+                setMyAlert("There aren't products")
+            }
             setListLaptop(res.data)
         }); 
+    }
+
+    useEffect(() => {
+        const callLaptopsEffect = () => {
+            axios.get("http://144.22.242.102/api/laptop/all").then(function(res){
+                if(res.data.length === 0){
+                    setMyAlert("There aren't products")
+                }
+                setListLaptop(res.data)
+            }); 
+        }
+        callLaptopsEffect()
     }, []);
 
     useEffect(() => {
         const changeOptionCrud = () => {
-            let inp = myRef.inpId.current
+            let inp = myRef.current
             if(optionCrud === "POST"){
                 setLaptop({...laptop, id:""})
                 inp.disabled = true
@@ -49,32 +74,29 @@ const Laptops = () =>{
         }
         changeOptionCrud()
     }, [optionCrud]);
-
-    const handleChange = (event) => {
-        const {name, value} = event.target
-        setLaptop({...laptop, [name]:value})
-    }
-
-    const handleCrudChange = (event) => {
-        setOptionCrud(event.target.value)
-    }
     
     const setInputs = () => {
         let keys = Object.keys(laptop)
         let divInputs = []
-        let i = 0
         for(const key of keys){
+            let type = "text"
+            if(key === "id" || key === "price" || key === "quantity"){
+                type = "number"
+            }/* else if(key === "password"){
+                type = "password"
+            } */
+
             if(key === "id"){
                 divInputs.push(
-                    <div key={i++}>
+                    <div key={key}>
                         <label className='aside-label'>
                             { key[0].toUpperCase() + key.slice(1)}
                         </label>
                         <input 
-                            ref={myRef.inpId}
+                            ref={myRef}
                             name={key}
                             value={laptop[key]}
-                            onChange={handleChange} 
+                            onChange={inputChange} 
                             type="number"
                             className='aside-input' 
                             required
@@ -83,17 +105,34 @@ const Laptops = () =>{
                     </div>
                 )
                 continue;
+            }else if(key === "availability"){
+                divInputs.push(
+                    <div key={key}>
+                        <select
+                            name={key}
+                            value={laptop[key]}
+                            onChange={inputChange}
+                            className="aside-input" 
+                            required
+                            style={{height: '50px'}}>
+                                <option value="" disabled defaultValue>Availability</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
+                    </div>
+                )
+                continue;
             }
             divInputs.push(
-                <div key={i++}>
+                <div key={key}>
                     <label className='aside-label'>
                         { key[0].toUpperCase() + key.slice(1)}
                     </label>
                     <input 
                         name={key}
                         value={laptop[key]}
-                        onChange={handleChange} 
-                        type="text"
+                        onChange={inputChange} 
+                        type={type}
                         className='aside-input' 
                         required>
                     </input>
@@ -107,7 +146,6 @@ const Laptops = () =>{
         axios.get("http://144.22.242.102/api/laptop/"+id).then(function(res){
             setLaptop(res.data)
             setOptionCrud("PUT")
-            
         }); 
     }
 
@@ -130,7 +168,6 @@ const Laptops = () =>{
             
             for(const key in laptop){
                 tableTd.push(<td key={key}>{""+laptop[key]+""}</td>)
-                
             }
             tableTd.push(
                 <td key={i++}>
@@ -149,10 +186,12 @@ const Laptops = () =>{
         console.log(optionCrud)
         if(optionCrud === "POST"){
             axios.post("http://144.22.242.102/api/laptop/new", laptop).then(function(res){
-            alert("Created data")
+                callLaptops()
+                alert("Created data")
         }); 
         }else{
             axios.put("http://144.22.242.102/api/laptop/update", laptop).then(function(res){
+                callLaptops()
                 alert("Updated data")
             }); 
         }
@@ -161,12 +200,14 @@ const Laptops = () =>{
     const delet = (id) => {
         axios.delete("http://144.22.242.102/api/laptop/"+id).then(function(res){
             alert("Deleted data")
+            callLaptops()
         }); 
     }
 
     return(
         <>
             <div className="main2 main2-tables">
+                <h2 className="alert2">{myAlert}</h2>
                 <div className="div-table">
                     <table className="table" style={{marginBottom: '0'}}>
                         <thead><tr>{setThead()}</tr></thead>
@@ -176,8 +217,8 @@ const Laptops = () =>{
             </div>
             <aside className="aside aside-tables">
                 <div className="aside-laptop">
-                    <h3 className="aside-name">Laptops</h3>
-                    <select value={optionCrud} onChange={handleCrudChange} className='aside-inpu'>
+                    <h2 className="aside-name">Laptops</h2>
+                    <select value={optionCrud} onChange={crudChange} className='aside-inpu'>
                         <option value="POST">Create</option>
                         <option value="PUT">Update</option>
                     </select>

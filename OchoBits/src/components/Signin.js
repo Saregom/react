@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from 'axios';
 import { ReactComponent as Logo } from './sources/logo-ochobits2.svg';
 import { useNavigate, NavLink } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 
 const Signin = () =>{
 
@@ -15,10 +17,12 @@ const Signin = () =>{
         address: "",
         cellPhone: "",
         zone: "",
-        type: "",
+        type: "CLIENT",
     });
 
     const [passConfirm, setPassConfirm ] = useState("");
+
+    const [typePass, setTypePass ] = useState("password");
 
     const [required, setRequired ] = useState({
         reqEmail: "",
@@ -31,8 +35,26 @@ const Signin = () =>{
         setUser({...user, [name]:value})
     }
 
-    const handleChange2 = (event) => {
+    const passConfirmChange = (event) => {
         setPassConfirm(event.target.value)
+    }
+
+    const typePassChange = (type) => {
+        setTypePass(type)
+    }
+
+    const btnPassword = () => {
+        let myType, myIcon
+        if(typePass === "password"){
+            myType="text"
+            myIcon = faEye
+        }else if(typePass === "text"){
+            myType="password"
+            myIcon = faEyeSlash
+        }
+        return(
+            <button className='btn-show-pass' type="button" onClick={() => typePassChange(myType)}><FontAwesomeIcon className="fas fa-eye" icon={ myIcon }/></button>
+        )
     }
     
     const validations = async (event) => {
@@ -43,20 +65,21 @@ const Signin = () =>{
             reqConfirmPass: ""
         }
 
-        await axios.get("http://144.22.242.102/api/user/emailexist/"+user.email).then(function(res){
+        await axios.get(`http://144.22.242.102/api/user/emailexist/${user.email}`).then(function(res){
             const data = res.data
-            reqs.reqEmail = (data) ? "La direccion de correo ya existe" : ""
+            reqs.reqEmail = (data) ? "Email is already in use" : ""
         });
-        reqs.reqPass = (user.password.length<8) ? "La contraseña debe tener minimo 8 caracteres" : ""
+        reqs.reqPass = (user.password.length<8) ? "The password must have at least 8 characters" : ""
 
-        reqs.reqConfirmPass = (user.password !== passConfirm) ? "Las contraseñas no coinciden" : ""
+        reqs.reqConfirmPass = (user.password !== passConfirm) ? "Passwords don't match" : ""
 
         setRequired({...reqs})
         let correct = true;
         for(const msg in reqs){
             if(reqs[msg].length !== 0){
                 correct = false
-                //alert("There are errors, check inputs")
+                alert("There are errors, check inputs")
+                break;
             }
         }
         if(correct){
@@ -66,15 +89,11 @@ const Signin = () =>{
 
     let navigate = useNavigate();
     const registerClient = () =>{
-        axios.post("http://144.22.242.102/api/user/new", user).then(function(res){
+        axios.post(`http://144.22.242.102/api/user/new/`, user).then(function(res){
             sessionStorage.setItem("idUser", res.data.id)
             navigate("/home", { replace: true });
             alert("Successful registration!")
-            
         });
-            /* 
-                sessionStorage.setItem("name", datos.name)
-            }); */
     }
     return(
         <div className="cont cont-signin">
@@ -132,25 +151,30 @@ const Signin = () =>{
                             value={user.password}
                             onChange={handleChange}
                             className="form-control"
-                            type="password"
+                            type={typePass}
                             placeholder="."
+                            autoComplete="off"
                             required
                             style={{height: '50px'}}/>
                             <label>Password</label>
                             <p className="required">{required.reqPass}</p>
                         </div>
-                        <div className="col-sm form-floating">
+                        <div className="col form-floating">
                             <input 
                             name="passConfirm" 
                             value={passConfirm}
-                            onChange={handleChange2}
+                            onChange={passConfirmChange}
                             className="form-control" 
-                            type="password" 
-                            placeholder="." 
+                            type={typePass}
+                            placeholder="."
+                            autoComplete="off" 
                             required 
                             style={{height: '50px'}}/>
                             <label>Confirm password</label>  
                             <p className="required">{required.reqConfirmPass}</p>
+                        </div>
+                        <div className="col-auto col-show-pass">
+                            {btnPassword()}
                         </div>
                     </div>
                     <div className="row">
@@ -180,7 +204,7 @@ const Signin = () =>{
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col form-floating">
+                        <div className="col-sm form-floating">
                             <input 
                             name="address" 
                             value={user.address}
@@ -192,9 +216,7 @@ const Signin = () =>{
                             style={{height: '50px'}}/>
                             <label>Adress</label>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col form-floating">
+                        <div className="col-sm form-floating">
                             <input 
                             name="cellPhone" 
                             value={user.cellPhone}
@@ -208,30 +230,21 @@ const Signin = () =>{
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-sm form-floating">
-                            <input 
-                            name="zone" 
+                        <div className="col select-father">
+                            <select
+                            name="zone"
                             value={user.zone}
-                            onChange={handleChange}
-                            className="form-control" 
-                            type="text" 
-                            placeholder="." 
-                            required 
-                            style={{height: '50px'}}/>
-                            <label >Zone</label>
-                        </div>
-                        <div className="col-sm select-father">
-                            <select 
-                            name="type"
-                            value={user.type}
                             onChange={handleChange}
                             className="selected" 
                             required
                             style={{height: '50px'}}>
-                                <option value="" disabled defaultValue>Type</option>
-                                <option value="COORD">COORD</option>
-                                <option value="ASE">ASE</option>
-                                <option value="ADM">ADM</option>
+                                <option value="" disabled defaultValue>Zone</option>
+                                <option value="Zone 1">Zone 1</option>
+                                <option value="Zone 2">Zone 2</option>
+                                <option value="Zone 3">Zone 3</option>
+                                <option value="Zone 4">Zone 4</option>
+                                <option value="Zone 5">Zone 5</option>
+                                <option value="Zone 6">Zone 6</option>
                             </select>
                         </div>
                     </div>

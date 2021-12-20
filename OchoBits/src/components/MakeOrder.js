@@ -1,10 +1,10 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
+import LaptopsList from "./laptopsList";
 
-
-const Orders = () =>{
+const MakeOrder = () =>{
 
     const [inputsOrder, setinputsOrder ] = useState({list:[]})
 
@@ -15,8 +15,6 @@ const Orders = () =>{
     const [OrdProd, setOrdProd ] = useState({0: 0})
 
     const [OrdQuan, setOrdQuan ] = useState({0: 0})
-
-    const [listLaptop, setListLaptop ] = useState([])
 
     const OrdProdChange = (event) =>{
         const {name, value} = event.target
@@ -74,19 +72,19 @@ const Orders = () =>{
         let isoDateTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         let salesMan = {}, products = {}, quantities = {}
 
-        //let id = sessionStorage.getItem("idUser")
-        await axios.get("http://144.22.242.102/api/user/3").then(function(res){
+        let id = sessionStorage.getItem("idUser")
+        await axios.get(`http://144.22.242.102/api/user/${id}`).then(function(res){
             salesMan = {...res.data}
         }); 
         
-        let i = 1
+        let indx = 1
         for(const id in OrdProd){
             let idLap = OrdProd[id]
-            await axios.get("http://144.22.242.102/api/laptop/"+idLap).then(function(res){
-                products[i] = {...res.data}
+            await axios.get(`http://144.22.242.102/api/laptop/${idLap}`).then(function(res){
+                products[indx] = {...res.data}
             });
-            quantities[i] = OrdQuan[id]
-            i++
+            quantities[indx] = OrdQuan[id]
+            indx++
         }
         let myData={
             registerDay: isoDateTime,
@@ -101,48 +99,17 @@ const Orders = () =>{
         });
     }
 
-    useEffect(() => {
-        axios.get("http://144.22.242.102/api/laptop/all").then(function(res){
-            setListLaptop(res.data)
-        }); 
-    }, []);
-
-    const setTbody = () => {
-        let table = []
-        let i = 0
-        for(const laptop of listLaptop){
-            let tableTr = []
-            
-            for(const key in laptop){
-                if(key === "quantity" || key === "photography"){
-                    continue
-                }
-                tableTr.push(<tr key={key}><th>{key}</th><td>{""+laptop[key]+""}</td></tr>)
-            }
-            table.push( 
-                <div key={i++} className='col col-orders'>
-                    <div className='div-table-prod'>
-                        <table className='table-ord-prod'>
-                            <tbody>{tableTr}</tbody>
-                        </table>
-                    </div>
-                </div>)
-        }
-        return table
-    }
-
     return(
         <>
             <div className="main main-orders-ase">
-                <aside className="aside aside-orders">
+                <aside className="aside aside-top">
                     <h3 className="aside-name">Make your order</h3>
-                    
                         <form onSubmit={postOrders}>
                             <table className="table aside-table-ord" style={{marginBottom: '0'}}>
                                 <thead className="aside-thead">
                                     <tr>
                                         <th>Del</th>
-                                        <th>Prod. Id</th>
+                                        <th>Lap. Id</th>
                                         <th>Quantity</th>
                                     </tr>
                                 </thead>
@@ -177,17 +144,14 @@ const Orders = () =>{
                             <input className="aside-btn" type="submit" value="Send order"/>
                         </form>
                 </aside>
-
                 <div className="main2 main2-orders">
-                    <h1>Products</h1>
-                    <h1 className="alert1">There aren't products</h1>
-                    <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 row-tables-prod">
-                        {setTbody()}
-                    </div>
+                    <h1>Laptops</h1>
+                    <LaptopsList/>
                 </div>
+                
             </div>
         </>
     )
 }
 
-export default Orders;
+export default MakeOrder;

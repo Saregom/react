@@ -20,13 +20,13 @@ const Home = () => {
     let navigate = useNavigate();
 
     useEffect(() =>{
-            let id = sessionStorage.getItem("idUser")
-            if (id==null) {
-                alert("You must logued first")
-                navigate("/signin", { replace: true });
-                return;
-            }
-    }, [])
+        let id = sessionStorage.getItem("idUser")
+        if (id==null) {
+            alert("You must logued first")
+            navigate("/signin", { replace: true });
+            return;
+        }
+    }, [navigate])
 
     const Welcome = () =>{
         return(

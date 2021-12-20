@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle, faBars } from '@fortawesome/free-solid-svg-icons';
 import { ReactComponent as Logo } from './sources/logo-ochobits2.svg';
 import { NavLink, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const Header = () =>{
@@ -22,20 +22,25 @@ const Header = () =>{
         tables:<></>
     })
 
+    const [cont, setCont ] = useState(0)
+
     let navigate = useNavigate();
     const backHome = () => {
         navigate("/home", { replace: true });
     }
 
-    useEffect(() =>{ 
-        const firstProcces = () => {
+    const firstProcces = () => {
+        if(cont === 0){
+            console.log(cont)
+            
             let id = sessionStorage.getItem("idUser")
             axios.get("http://144.22.242.102/api/user/"+id).then(function(res){
+                setCont(1)
                 let myNameHeader = {...nameHeader}
                 let user = res.data
                 let arrayName = user.name.split(" ")
                 myNameHeader.nameUser = arrayName[0]
-
+    
                 setPathProfile("/home/profile/"+user.name+"")
                 
                 if(user.type === "ASE" || user.type === "CLIENT"){
@@ -47,10 +52,11 @@ const Header = () =>{
                     myNameHeader.tables = <NavLink className="txt-menu" exact="true" to="/home/editdata">Edit data</NavLink>
                 }
                 setNameHeader({...myNameHeader}) 
+                
             }); 
         }
-        firstProcces()
-    }, [])
+    }
+    firstProcces()
 
     let rerfPopUp = myRef.menuPopUp.current
     let refMenuLeft = myRef.menuLeft.current

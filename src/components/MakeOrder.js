@@ -80,9 +80,12 @@ const MakeOrder = () =>{
         let indx = 1
         for(const id in OrdProd){
             let idLap = OrdProd[id]
+            let myData
             await axios.get(`http://144.22.242.102/api/laptop/${idLap}`).then(function(res){
-                products[indx] = {...res.data}
+                myData = {...res.data}
+                
             });
+            products[indx] = {...myData}
             quantities[indx] = OrdQuan[id]
             indx++
         }

@@ -73,7 +73,7 @@ const Users = () =>{
             }
         }
         changeOptionCrud()
-    }, [optionCrud]);
+    }, [optionCrud, myRef, user]);
     
     const setInputs = () => {
         let keys = Object.keys(user)

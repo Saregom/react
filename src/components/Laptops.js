@@ -73,7 +73,7 @@ const Laptops = () =>{
             }
         }
         changeOptionCrud()
-    }, [optionCrud]);
+    }, [optionCrud, laptop, myRef]);
     
     const setInputs = () => {
         let keys = Object.keys(laptop)
